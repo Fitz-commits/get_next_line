@@ -16,7 +16,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #ifndef BUFFER_SIZE
-#define BUFFER_SIZE 5
+#define BUFFER_SIZE 0
 #endif
 
 int		search_buf(char *buf)
@@ -44,27 +44,6 @@ char		*ft_strcpy(char *dest, const char *src)
 		i++;
 	}
 	dest[i] = 0;
-	return (dest);
-}
-
-
-char	*ft_strcat(char *dest, const char *src)
-{
-	int i;
-	int i2;
-
-	i = 0;
-	while (dest[i])
-		i++;
-	i2 = i;
-	i = 0;
-	while (src[i])
-	{
-		dest[i2] = src[i];
-		i++;
-		i2++;
-	}
-	dest[i2] = '\0';
 	return (dest);
 }
 
@@ -177,6 +156,11 @@ char		*ft_stradd(char *rest, char *s2)
 	return (rest);
 }
 
+int		ligne_find(char *rest, char *buf)
+{
+	
+}
+
 int		get_next_line(int fd, char **line)
 {
 	static char *rest = NULL;
@@ -273,3 +257,12 @@ int	main(int argc, char **argv)
 	close(fd);
 	return (0);
 }
+
+/*
+
+left to do :
+
+1. Séparer les fonction, optimiser la place et l'espace
+2. Accepter différents fd
+
+*/
