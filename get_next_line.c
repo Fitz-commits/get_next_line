@@ -16,7 +16,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #ifndef BUFFER_SIZE
-#define BUFFER_SIZE 0
+#define BUFFER_SIZE 5
 #endif
 
 int		search_buf(char *buf)
@@ -127,38 +127,50 @@ char *change_rest(char *rest, char *nrest)
 char		*ft_stradd(char *rest, char *s2)
 {
 	char			*copy;
-	int				i;
-	int				j;
+	char			*copy_cpp;
+	char			*rest_cpp;
 
-	i = 0;
-	j = 0;
-	copy = 0;
 	if (rest == 0 && s2 == 0)
 		return (0);
 	copy = ft_strdup(rest);
 	free(rest);
-	rest = NULL;
+	copy_cpp = copy;
 	if (!(rest = (char*)malloc(sizeof(char) * (ft_strlen(copy)
 		+ ft_strlen(s2) + 1))))
 		return (0);
-	while (copy[i])
-	{
-		rest[i] = copy[i];
-		i++;
-	}
-	while (s2[j])
-	{
-		rest [i + j] = s2[j];
-		j++;
-	}
-	free(copy);
-	rest[i + j] = 0;
-	return (rest);
+	rest_cpp = rest;
+	while (*copy)
+		*rest++ = *copy++;
+	while (*s2)
+		*rest++ = *s2++;
+	free(copy_cpp);
+	*rest = 0;
+	return (rest_cpp);
 }
 
-int		ligne_find(char *rest, char *buf)
+char		*ligne_find(char *rest, char **line) //should escalate error tbd
 {
-	
+	char cpp_local[BUFFER_SIZE + 1];
+
+	if(search_buf(rest) == ft_strlen(rest) - 1)
+		{
+			if(!(*line = ft_strndup((rest), search_buf(rest))))
+				return (0);
+			free(rest);
+			rest = NULL;
+		}
+	else
+		{
+			ft_strcpy(cpp_local, &rest[search_buf(rest) + 1]);
+			printf("rest = %s\n", rest);		
+			if(!(*line = ft_strndup(rest, search_buf(rest))))
+					return (0);
+			free(rest);
+			rest = 0;
+			if(!(rest = strdup(cpp_local)))
+				return (0);
+		}
+	return (rest);
 }
 
 int		get_next_line(int fd, char **line)
@@ -167,33 +179,17 @@ int		get_next_line(int fd, char **line)
 	char buf[BUFFER_SIZE + 1];
 	int br;
 
-	br = 0;
 	while(((br = read(fd, buf, BUFFER_SIZE)) > 0) || rest)
 	{
 		buf[br] = 0;
+
 		if (rest)
 			rest = ft_stradd(rest, buf);
 		else
 			rest = strdup(buf);
 		if(search_buf(rest) > -1)
 		{
-			if(search_buf(rest) == ft_strlen(rest) - 1)
-			{
-				if(!(*line = ft_strndup((rest), search_buf(rest))))
-					return (-1);
-				free(rest);
-				rest = NULL;
-			}
-			else
-			{
-			ft_strcpy(buf, &rest[search_buf(rest) + 1]);
-			if(!(*line = ft_strndup(rest, search_buf(rest))))
-				return (-1);
-			free(rest);
-			rest = 0;
-			if(!(rest = strdup(buf)))
-				return (-1);
-			}
+			rest = ligne_find(rest, line);
 			return (1);
 		}
 	}
