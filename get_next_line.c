@@ -124,14 +124,14 @@ char *change_rest(char *rest, char *nrest)
 	return (rest);
 }
 
-char		*ft_stradd(char *rest, char *s2)
+char		*ft_strnadd(char *rest, char *s2, int n)
 {
 	char			*copy;
 	char			*copy_cpp;
 	char			*rest_cpp;
 
-	if (rest == 0 && s2 == 0)
-		return (0);
+	if(rest == NULL)
+		return (ft_strndup(s2, n));
 	copy = ft_strdup(rest);
 	free(rest);
 	copy_cpp = copy;
@@ -141,89 +141,55 @@ char		*ft_stradd(char *rest, char *s2)
 	rest_cpp = rest;
 	while (*copy)
 		*rest++ = *copy++;
-	while (*s2)
+	while (*s2 && n--)
 		*rest++ = *s2++;
 	free(copy_cpp);
 	*rest = 0;
 	return (rest_cpp);
 }
 
-char		*ligne_find(char *rest, char **line) //should escalate error tbd
+ /*int		*read_it(char *rest,char **line)
 {
-	char cpp_local[BUFFER_SIZE + 1];
-
-	if(search_buf(rest) == ft_strlen(rest) - 1)
-		{
-			if(!(*line = ft_strndup((rest), search_buf(rest))))
-				return (0);
-			free(rest);
-			rest = NULL;
-		}
-	else
-		{
-			ft_strcpy(cpp_local, &rest[search_buf(rest) + 1]);
-			printf("rest = %s\n", rest);		
-			if(!(*line = ft_strndup(rest, search_buf(rest))))
-					return (0);
-			free(rest);
-			rest = 0;
-			if(!(rest = strdup(cpp_local)))
-				return (0);
-		}
-	return (rest);
+		if(!(*line = strndup(rest, search_buf(rest))))
+			return (-1);
+		rest = change_rest(rest, &rest[search_buf(rest) +1]);
+			return (1);
 }
-
+*/
 int		get_next_line(int fd, char **line)
 {
 	static char *rest = NULL;
 	char buf[BUFFER_SIZE + 1];
 	int br;
 
-	while(((br = read(fd, buf, BUFFER_SIZE)) > 0) || rest)
+	if(rest)
 	{
-		buf[br] = 0;
-
-		if (rest)
-			rest = ft_stradd(rest, buf);
-		else
-			rest = strdup(buf);
-		if(search_buf(rest) > -1)
+		if (search_buf(rest) > -1)
 		{
-			rest = ligne_find(rest, line);
+			if(!(*line = strndup(rest, search_buf(rest))))
+				return (0);
+			rest = change_rest(rest, &rest[search_buf(rest) +1]);
 			return (1);
 		}
+		*line = strdup(rest);
+		free(rest);
+	}
+	while(((br = read(fd, buf, BUFFER_SIZE)) > 0))	
+	{
+		buf[br] = 0;
+		if(search_buf(buf) > -1)
+		{
+			if (!(rest = ft_strdup(&buf[search_buf(buf) + 1])))
+				return (-1);
+			if (!(*line = ft_strnadd(*line, buf, search_buf(buf))))
+				return (-1);
+			return (1);
+		}
+		*line = ft_strnadd(*line, buf, ft_strlen(buf));
 	}
 	return (0);
-
 }
 
-/* int		get_next_line(int fd, char **line)
-{
-	static t_list *fil;
-	t_list *temp;
-	t_list *node;
-	char *buf;
-	int found;
-
-
-	if(search_buf(fil->s))
-		if(search_buf(fil->s) == ft_strlen(fil->s))
-			{
-				if(!(*line =ft_strdup(fil->s)))
-					return (0);
-				free(fil->s);
-				free(fil);
-				return (1);
-			}
-		if (!(*line =ft_strndup(fil->s, search_buf(fil->s))))
-			return(0);
-		fil->s = change_rest(fil->s, &fil->s[search_buf(fil->s)]);
-		return (1);
-
-	
-	
-}
-*/
 int	main(int argc, char **argv)
 {
 	int		i;
@@ -253,12 +219,3 @@ int	main(int argc, char **argv)
 	close(fd);
 	return (0);
 }
-
-/*
-
-left to do :
-
-1. Séparer les fonction, optimiser la place et l'espace
-2. Accepter différents fd
-
-*/
