@@ -13,12 +13,21 @@
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 
-#include <string.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <limits.h>
+#ifndef BUFFER_SIZE
+#define BUFFER_SIZE 5
+#endif
 
-typedef struct s_list
-{
-char 			*s;
-struct s_list 	*next;
-}	t_list;
+char		*ft_strcpy(char *dest, const char *src);
+int			ft_strlen(const char *str);
+char		*ft_strncpy(char *dest, const char *src, size_t n);
+char		*ft_strdup(const char *src);
+char		*ft_strndup(const char *src, size_t n);
+int			search_buf(char *buf);
+char		*ft_strnadd(char *rest, char *s2);
+int			handle_rest(char **line, char *rest);
 
 #endif

@@ -11,13 +11,6 @@
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <unistd.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <stdio.h>
-#ifndef BUFFER_SIZE
-#define BUFFER_SIZE 5
-#endif
 
 int		search_buf(char *buf)
 {
@@ -33,105 +26,14 @@ int		search_buf(char *buf)
 	return (-1);
 }
 
-char		*ft_strcpy(char *dest, const char *src)
-{
-	int i;
-
-	i = 0;
-	while (src[i] != 0)
-	{
-		dest[i] = src[i];
-		i++;
-	}
-	dest[i] = 0;
-	return (dest);
-}
-
-int		ft_strlen(const char *str)
-{
-	int i;
-
-	if (!str)
-	{
-		return(0);
-	}
-	
-	i = 0;
-	while (str[i])
-		i++;
-		
-	return (i);
-}
-
-char	*ft_strncpy(char *dest, const char *src, size_t n)
-{
-	size_t i;
-
-	i = 0;
-	while (src[i] != 0 && i < n)
-	{
-		dest[i] = src[i];
-		i++;
-	}
-	while (i < n)
-	{
-		dest[i] = '\0';
-		i++;
-	}
-	return (dest);
-}
-
-char		*ft_strdup(const char *src)
-{
-	char *fin;
-
-	fin = malloc(sizeof(char) * (ft_strlen(src) + 1));
-	if (fin == 0)
-		return (0);
-	ft_strcpy(fin, src);
-	return (&*fin);
-}
-
-char		*ft_strndup(const char *src, size_t n)
-{
-	char *dest;
-
-	if (!(dest = malloc(sizeof(char) * (n + 1))))
-		return (0);
-	dest = ft_strncpy(dest, src, n);
-	dest[n] = 0;
-	return (&*dest);
-}
-
-
-char *change_rest(char *rest, char *nrest)
-{	
-	int size;
-	int i;
-
-	i = 0;
-	if(rest)
-		free(rest);
-	size = ft_strlen(nrest);
-	if(!(rest = malloc(sizeof(char) * (size + 1))))
-		return (0);
-	while(i < size)
-	{
-		rest[i] = nrest[i];
-		i++;
-	}
-	rest[i] = 0;
-	return (rest);
-}
-
-char		*ft_strnadd(char *rest, char *s2, int n)
+char		*ft_strnadd(char *rest, char *s2)
 {
 	char			*copy;
 	char			*copy_cpp;
 	char			*rest_cpp;
 
 	if(rest == NULL)
-		return (ft_strndup(s2, n));
+		return (ft_strdup(s2));
 	copy = ft_strdup(rest);
 	free(rest);
 	copy_cpp = copy;
@@ -141,63 +43,69 @@ char		*ft_strnadd(char *rest, char *s2, int n)
 	rest_cpp = rest;
 	while (*copy)
 		*rest++ = *copy++;
-	while (*s2 && n--)
+	while (*s2)
 		*rest++ = *s2++;
 	free(copy_cpp);
 	*rest = 0;
 	return (rest_cpp);
 }
 
- /*int		*read_it(char *rest,char **line)
+int		handle_rest(char **line, char *rest)
 {
-		if(!(*line = strndup(rest, search_buf(rest))))
-			return (-1);
-		rest = change_rest(rest, &rest[search_buf(rest) +1]);
-			return (1);
+	// needs to see if it has a rest, return 1 if it has a rest return 0 if it has not and return -1 if it has a nl
+	int isRest;
+
+	isRest = (rest[0] == 0) ? 0 : 1;
+	if(search_buf(rest) == -1)
+	{
+		*line = ft_strdup(rest);
+		rest[0] = 0;
+		return (isRest);
+	}
+	if(search_buf(rest) + 1 == ft_strlen(rest))
+		isRest = -1;
+	*line = ft_strndup(rest, search_buf(rest));
+	ft_strcpy(rest, &rest[search_buf(rest) + 1]);
+	return (isRest);
+
 }
-*/
+
 int		get_next_line(int fd, char **line)
 {
-	static char *rest = NULL;
+	static char rest[OPEN_MAX][BUFFER_SIZE + 1] = {{0}};
 	char buf[BUFFER_SIZE + 1];
 	int br;
+	int isRest;
 
-	if(rest)
-	{
-		if (search_buf(rest) > -1)
-		{
-			if(!(*line = strndup(rest, search_buf(rest))))
-				return (0);
-			rest = change_rest(rest, &rest[search_buf(rest) +1]);
-			return (1);
-		}
-		*line = strdup(rest);
-		free(rest);
-	}
-	while(((br = read(fd, buf, BUFFER_SIZE)) > 0))	
+	if (fd < 0 || fd > OPEN_MAX || line == NULL || BUFFER_SIZE < 0)
+		return (-1);
+	if ((isRest = handle_rest(line, rest[fd])) == -1)
+		return(1);
+	while((rest[fd][0] == 0) &&((br = read(fd, buf, BUFFER_SIZE)) > 0))
 	{
 		buf[br] = 0;
-		if(search_buf(buf) > -1)
+		if(search_buf(buf) != -1 )
 		{
-			if (!(rest = ft_strdup(&buf[search_buf(buf) + 1])))
-				return (-1);
-			if (!(*line = ft_strnadd(*line, buf, search_buf(buf))))
-				return (-1);
+			ft_strcpy(rest[fd], &buf[search_buf(buf) + 1]);
+			buf[search_buf(buf)] = 0;
+			*line = ft_strnadd(*line, buf);
 			return (1);
 		}
-		*line = ft_strnadd(*line, buf, ft_strlen(buf));
+		*line = ft_strnadd(*line, buf);
 	}
-	return (0);
+	if(isRest || ft_strlen(*line))
+		return (1);
+	return (br == -1 ? -1 : 0);
 }
 
-int	main(int argc, char **argv)
+ /*int	main(int argc, char **argv)
 {
 	int		i;
 	int		fd;
 	char	*line;
 	int		ret;
 
-	/* printf("limit fdmax %d\n", OPEN_MAX); */
+	 printf("limit fdmax %d\n", OPEN_MAX); 
 	if (argc != 2)
 	{
 		printf("You forgot the filename");
@@ -219,3 +127,5 @@ int	main(int argc, char **argv)
 	close(fd);
 	return (0);
 }
+
+*/
