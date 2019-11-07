@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: cdelaby <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/11 07:53:16 by cdelaby           #+#    #+#             */
-/*   Updated: 2019/11/04 10:58:07 by cdelaby          ###   ########.fr       */
+/*   Created: 2019/11/07 12:10:34 by cdelaby           #+#    #+#             */
+/*   Updated: 2019/11/07 12:10:36 by cdelaby          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdio.h>
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 int				search_buf(char *buf)
 {

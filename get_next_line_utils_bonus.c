@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: cdelaby <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/24 21:35:21 by cdelaby           #+#    #+#             */
-/*   Updated: 2019/10/30 14:57:13 by cdelaby          ###   ########.fr       */
+/*   Created: 2019/11/07 12:10:55 by cdelaby           #+#    #+#             */
+/*   Updated: 2019/11/07 12:10:57 by cdelaby          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char			*ft_strcpy(char *dest, const char *src)
 {
